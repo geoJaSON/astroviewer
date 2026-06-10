@@ -357,6 +357,19 @@ button {
   border-color: var(--amber);
 }
 
+.loc-manual button:disabled {
+  opacity: 0.45;
+  cursor: wait;
+}
+
+.loc-geo-err {
+  margin-top: 8px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: #e88a8a;
+  line-height: 1.4;
+}
+
 /* ------------------------------------------------------------ timebar --- */
 
 .timebar {

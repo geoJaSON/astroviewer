@@ -3,6 +3,7 @@ import type { Catalog } from '../data/catalog'
 import { SKY_BODIES } from '../astro/bodies'
 import { formatLatLon } from '../astro/format'
 import { slewSkyToSelection } from '../state/actions'
+import { resolveDeviceLocation } from '../state/geolocate'
 import { useStore, type Selection, type ShowFlags } from '../state/store'
 import { TonightPanel } from './TonightPanel'
 
@@ -24,6 +25,7 @@ const TOGGLES: { key: keyof ShowFlags; label: string }[] = [
   { key: 'messier', label: 'MESSIER' },
   { key: 'orbits', label: 'ORBITS' },
   { key: 'dome', label: 'DOME' },
+  { key: 'horizon', label: 'HORIZON' },
   { key: 'minor', label: 'COMETS' },
   { key: 'sats', label: 'SATS' },
 ]
@@ -34,6 +36,8 @@ function LocationControl() {
   const [open, setOpen] = useState(false)
   const [lat, setLat] = useState(String(location.lat))
   const [lon, setLon] = useState(String(location.lon))
+  const [geoBusy, setGeoBusy] = useState(false)
+  const [geoErr, setGeoErr] = useState<string | null>(null)
   const rootRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -59,14 +63,18 @@ function LocationControl() {
     }
   }
 
-  const geolocate = () => {
-    navigator.geolocation?.getCurrentPosition(
-      (pos) => {
-        setLocation({ lat: pos.coords.latitude, lon: pos.coords.longitude, name: 'My location' })
-        setOpen(false)
-      },
-      () => {},
-    )
+  const geolocate = async () => {
+    setGeoBusy(true)
+    setGeoErr(null)
+    try {
+      const loc = await resolveDeviceLocation()
+      setLocation(loc)
+      setOpen(false)
+    } catch (err) {
+      setGeoErr(err instanceof Error ? err.message : 'Location unavailable')
+    } finally {
+      setGeoBusy(false)
+    }
   }
 
   return (
@@ -95,8 +103,15 @@ function LocationControl() {
             <input value={lat} onChange={(e) => setLat(e.target.value)} placeholder="lat" aria-label="latitude" />
             <input value={lon} onChange={(e) => setLon(e.target.value)} placeholder="lon" aria-label="longitude" />
             <button onClick={applyManual}>SET</button>
-            <button onClick={geolocate} title="Use device location">⌖</button>
+            <button
+              onClick={geolocate}
+              disabled={geoBusy}
+              title={window.isSecureContext ? 'Use device GPS' : 'Use network location (GPS needs HTTPS)'}
+            >
+              {geoBusy ? '…' : '⌖'}
+            </button>
           </div>
+          {geoErr && <p className="loc-geo-err">{geoErr}</p>}
         </div>
       )}
     </div>

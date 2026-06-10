@@ -266,8 +266,12 @@ export function SkyScene({ catalog }: { catalog: Catalog }) {
         <spriteMaterial map={reticle} transparent depthWrite={false} depthTest={false} />
       </sprite>
 
-      <Ground />
-      <HorizonRing />
+      {show.horizon && (
+        <>
+          <Ground />
+          <HorizonRing />
+        </>
+      )}
       <CardinalMarks />
     </>
   )

@@ -20,6 +20,8 @@ export interface ShowFlags {
   messier: boolean
   orbits: boolean
   dome: boolean
+  /** Ground disc + horizon ring in the sky view; clips the space-view LOS cone. */
+  horizon: boolean
   /** Comets + bright asteroids. */
   minor: boolean
   sats: boolean
@@ -31,6 +33,7 @@ const DEFAULT_SHOW: ShowFlags = {
   messier: true,
   orbits: true,
   dome: true,
+  horizon: true,
   minor: true,
   sats: true,
 }

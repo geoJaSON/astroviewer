@@ -395,7 +395,7 @@ export function SpaceScene({ catalog }: { catalog: Catalog }) {
           side={THREE.DoubleSide}
           depthWrite={false}
           blending={THREE.AdditiveBlending}
-          clippingPlanes={[horizonPlane]}
+          clippingPlanes={show.horizon ? [horizonPlane] : []}
         />
       </mesh>
 
